@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# Declare threshold 
+declare -i FREE_SPACE_THRESHOLD=20
+
+#Function to get and validate thershold input
+getAndValidateInput(){
+   if [ $1 -eq $1 2>/dev/null ]
+   then
+      FREE_SPACE_THRESHOLD=$1
+   else
+      echo "$1 is not a valid threshold, please provide a number between 0 to 100"
+      exit 1
+   fi
+}
+#Get threshold argument
+if [ ! -z $1 ]
+then
+   getAndValidateInput $1
+fi
+
+watchAndCheckDiskUsage(){
+   #Get usage for / disk
+   local usagePer=$(df -h / | awk '{print $5}' | tail -1)
+   #Remove % character and substract 100 to get free space
+   local -i freeSpace=$(( 100 - ${usagePer:0:-1}))
+   #Validate free space
+   if [ $freeSpace -lt $FREE_SPACE_THRESHOLD ]
+   then
+      echo "The free space is less than ${FREE_SPACE_THRESHOLD}, your currently free space is ${freeSpace}"
+   fi
+}
+
+#Display welcome message
+echo "Running free disk watcher script, current threshold: ${FREE_SPACE_THRESHOLD}"
+
+#Keep watching every 2 seconds
+while true
+do
+watchAndCheckDiskUsage
+sleep 2
+done
