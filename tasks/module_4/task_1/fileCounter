@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+declare DIRECTORY="/"
+
+#Function to get and validate directory input
+getAndValidateInput(){
+   if [ ! -z $1 ] && [ -d $1 ]
+   then
+      DIRECTORY=$1
+   else
+      echo "$1 is not a valid directory, please provide valid directory"
+      exit 1
+   fi
+}
+
+#Function to count and print file count
+countAndPrintDirectoryFiles(){
+    local -i count="$(find $DIRECTORY -type f | wc -l)"
+    echo "The directory $(readlink -e ${DIRECTORY}) and its subdirectories have ${count} files."
+}
+
+#Call function to get and validate input
+getAndValidateInput $1
+#Call gunction to count and print file count
+countAndPrintDirectoryFiles
